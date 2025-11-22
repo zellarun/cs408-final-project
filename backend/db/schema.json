@@ -1,0 +1,18 @@
+{
+  "TableName": "EmbroideryJobs",
+  "PrimaryKey": "jobId",
+  "Attributes": {
+    "jobId": "string",
+    "customerName": "string",
+    "jobType": "string",
+    "status": "string",
+    "dueDate": "string",
+    "createdAt": "string",
+    "garmentDetails": {
+      "brand": "string",
+      "color": "string",
+      "quantity": "number"
+    },
+    "notes": "string"
+  }
+}
