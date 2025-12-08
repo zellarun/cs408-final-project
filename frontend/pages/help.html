@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Help - Embroidery Job Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+    }
+
+    header {
+      background: #234b7a;
+      color: white;
+      padding: 10px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 10px;
+      font-size: 14px;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    main {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 0 10px;
+    }
+
+    .box {
+      background: white;
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    ul {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    .small {
+      font-size: 13px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Embroidery Job Tracker</h1>
+    <nav>
+      <a href="index.html">Dashboard</a>
+      <a href="add-job.html">Add Job</a>
+      <a href="view-jobs.html">View Jobs</a>
+      <a href="search.html">Search</a>
+      <a href="help.html">Help</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="box">
+      <h2>Overview</h2>
+      <p>
+        This small web app is meant to keep track of embroidery jobs (school uniforms,
+        business polos, jackets, hats, etc.). It does not replace your POS system, but it
+        gives you a clearer view of what is on the embroidery machine and what is ready.
+      </p>
+      <ul>
+        <li><strong>Dashboard:</strong> quick summary of job counts.</li>
+        <li><strong>Add Job:</strong> form for adding new embroidery orders.</li>
+        <li><strong>View Jobs:</strong> list of all jobs with filters.</li>
+        <li><strong>Search:</strong> find a job quickly while on the phone with a customer.</li>
+      </ul>
+    </section>
+
+    <section class="box">
+      <h2>Statuses</h2>
+      <p class="small">Each job should have one of these statuses:</p>
+      <ul>
+        <li><strong>Intake</strong> – Job was created. Garments are in the shop or on order.</li>
+        <li><strong>Art / Digitizing</strong> – Artwork is being prepared or changed.</li>
+        <li><strong>In Progress</strong> – Job is being framed/hooped/stitched.</li>
+        <li><strong>Ready for Pickup</strong> – Finished and bagged, waiting for the customer.</li>
+        <li><strong>Completed</strong> – Customer picked up or order was shipped and paid.</li>
+      </ul>
+    </section>
+
+    <section class="box">
+      <h2>Important Fields</h2>
+      <ul>
+        <li><strong>Customer Name:</strong> person you will contact.</li>
+        <li><strong>School / Business:</strong> example: “St. Mark”, “Burke Electrical”.</li>
+        <li><strong>Garment / Item Type:</strong> polo, hoodie, scrub top, hat, etc.</li>
+        <li><strong>Size Range:</strong> “YS–AXL”, “10 assorted sizes”, etc.</li>
+        <li><strong>Thread Colors:</strong> include real thread numbers if you have them.</li>
+        <li><strong>Logo Notes:</strong> any notes about how to place or scale the design.</li>
+        <li><strong>Promised Due Date:</strong> when you told the customer it would be ready.</li>
+        <li><strong>PO / Invoice #:</strong> reference to your POS / invoicing system.</li>
+        <li><strong>Internal Notes:</strong> anything extra for whoever runs the machine.</li>
+      </ul>
+    </section>
+
+    <section class="box">
+      <h2>Common Questions</h2>
+
+      <h3>What if a job changes?</h3>
+      <p>
+        If quantities or due dates change, update the job in the database and add a short note
+        so you remember what changed.
+      </p>
+
+      <h3>How do I find a job when someone calls?</h3>
+      <p>
+        Go to the Search page and type their name, school, or PO number. You can also filter by
+        status or due date if needed.
+      </p>
+
+      <h3>Who should update the status?</h3>
+      <p>
+        Usually, the person doing the work at that step (intake, art, embroidery, front counter)
+        should switch the status when they move the job along.
+      </p>
+    </section>
+  </main>
+</body>
+</html>

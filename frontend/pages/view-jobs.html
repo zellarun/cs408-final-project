@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>View Jobs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+    }
+
+    header {
+      background: #234b7a;
+      color: white;
+      padding: 10px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 10px;
+      font-size: 14px;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: 20px auto;
+      padding: 0 10px;
+    }
+
+    .box {
+      background: white;
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    select, input[type="text"] {
+      padding: 5px 7px;
+      font-size: 14px;
+    }
+
+    button {
+      padding: 6px 10px;
+      font-size: 14px;
+      border-radius: 3px;
+      border: none;
+      cursor: pointer;
+      background: #234b7a;
+      color: white;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 6px;
+      text-align: left;
+    }
+
+    th {
+      background: #f0f0f0;
+    }
+
+    tr:nth-child(even) {
+      background: #fafafa;
+    }
+
+    #jobs-count {
+      font-size: 13px;
+      color: #555;
+      margin-left: 8px;
+    }
+
+    #message {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Embroidery Job Tracker</h1>
+    <nav>
+      <a href="index.html">Dashboard</a>
+      <a href="add-job.html">Add Job</a>
+      <a href="view-jobs.html">View Jobs</a>
+      <a href="search.html">Search</a>
+      <a href="help.html">Help</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="box">
+      <h2>All Jobs</h2>
+
+      <div class="toolbar">
+        <label>
+          Status:
+          <select id="status-filter">
+            <option value="all">All</option>
+            <option value="Intake">Intake</option>
+            <option value="Art / Digitizing">Art / Digitizing</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Ready for Pickup">Ready for Pickup</option>
+            <option value="Completed">Completed</option>
+          </select>
+        </label>
+
+        <label>
+          Search:
+          <input type="text" id="search-box" placeholder="Customer, org, PO..." />
+        </label>
+
+        <button id="reload-btn">Reload</button>
+        <span id="jobs-count"></span>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Job ID</th>
+            <th>Customer</th>
+            <th>Org</th>
+            <th>Item</th>
+            <th>Qty</th>
+            <th>Status</th>
+            <th>Due Date</th>
+          </tr>
+        </thead>
+        <tbody id="jobs-body">
+          <!-- rows added by JS -->
+        </tbody>
+      </table>
+
+      <div id="message"></div>
+    </section>
+  </main>
+
+  <script>
+    const API_BASE = ""; // TODO: set real URL
+
+    const statusFilter = document.getElementById("status-filter");
+    const searchBox = document.getElementById("search-box");
+    const reloadBtn = document.getElementById("reload-btn");
+    const jobsBody = document.getElementById("jobs-body");
+    const jobsCount = document.getElementById("jobs-count");
+    const messageEl = document.getElementById("message");
+
+    let jobs = [];
+
+    function formatDate(s) {
+      if (!s) return "";
+      const d = new Date(s);
+      if (isNaN(d)) return s;
+      return d.toLocaleDateString();
+    }
+
+    function renderJobs() {
+      const statusVal = statusFilter.value;
+      const q = searchBox.value.trim().toLowerCase();
+      jobsBody.innerHTML = "";
+
+      let count = 0;
+
+      for (let i = 0; i < jobs.length; i++) {
+        const job = jobs[i];
+
+        // status filter
+        if (statusVal !== "all" && job.status !== statusVal) {
+          continue;
+        }
+
+        // text filter
+        if (q) {
+          const joined = [
+            job.jobId,
+            job.customerName,
+            job.organization,
+            job.poNumber,
+            job.itemType
+          ]
+            .filter(Boolean)
+            .join(" ")
+            .toLowerCase();
+
+          if (joined.indexOf(q) === -1) {
+            continue;
+          }
+        }
+
+        const tr = document.createElement("tr");
+
+        function addCell(text) {
+          const td = document.createElement("td");
+          td.textContent = text || "";
+          tr.appendChild(td);
+        }
+
+        addCell(job.jobId || "");
+        addCell(job.customerName || "");
+        addCell(job.organization || "");
+        addCell(job.itemType || "");
+        addCell(job.quantity != null ? job.quantity : "");
+        addCell(job.status || "");
+        addCell(formatDate(job.dueDate));
+
+        jobsBody.appendChild(tr);
+        count++;
+      }
+
+      if (count === 0) {
+        messageEl.textContent = "No jobs found with the current filters.";
+      } else {
+        messageEl.textContent = "";
+      }
+
+      jobsCount.textContent = count + " job(s) shown";
+    }
+
+    async function loadJobs() {
+      messageEl.textContent = "Loading jobs...";
+      jobsBody.innerHTML = "";
+      jobsCount.textContent = "";
+
+      try {
+        const res = await fetch(API_BASE + "/jobs");
+        if (!res.ok) {
+          throw new Error("Failed to load jobs");
+        }
+        jobs = await res.json();
+        messageEl.textContent = "";
+        renderJobs();
+      } catch (err) {
+        console.error(err);
+        messageEl.textContent = "Error loading jobs.";
+      }
+    }
+
+    statusFilter.addEventListener("change", renderJobs);
+    searchBox.addEventListener("input", renderJobs);
+    reloadBtn.addEventListener("click", loadJobs);
+
+    loadJobs();
+  </script>
+</body>
+</html>

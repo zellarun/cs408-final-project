@@ -2,63 +2,204 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Embroidery Job Tracker – Dashboard</title>
-  <link rel="stylesheet" href="../css/style.css" />
+  <title>Embroidery Job Tracker - Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+    }
+
+    header {
+      background: #234b7a;
+      color: white;
+      padding: 10px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 10px;
+      font-size: 14px;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 0 10px;
+    }
+
+    .box {
+      background: white;
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+
+    .stats-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .stat {
+      flex: 1 1 150px;
+      border: 1px solid #ddd;
+      padding: 10px;
+      background: #fafafa;
+    }
+
+    .stat-title {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      margin-top: 5px;
+    }
+
+    ul.links {
+      list-style: none;
+      padding-left: 0;
+      margin-top: 10px;
+    }
+
+    ul.links li {
+      margin-bottom: 8px;
+    }
+
+    ul.links a {
+      text-decoration: none;
+      color: #234b7a;
+    }
+
+    ul.links a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 12px;
+      color: #777;
+      margin: 25px 0 10px;
+    }
+  </style>
 </head>
 <body>
-  <header class="app-header">
+  <header>
     <h1>Embroidery Job Tracker</h1>
-    <nav class="main-nav">
-      <a href="index.html" class="active">Dashboard</a>
-      <a href="view-jobs.html">View Jobs</a>
+    <nav>
+      <a href="index.html">Dashboard</a>
       <a href="add-job.html">Add Job</a>
-      <a href="search.html">Search / Filter</a>
+      <a href="view-jobs.html">View Jobs</a>
+      <a href="search.html">Search</a>
       <a href="help.html">Help</a>
     </nav>
   </header>
 
-  <main class="container">
-    <section class="section">
-      <h2>Overview</h2>
-      <div class="card-grid">
-        <div class="card" id="card-total-jobs">
-          <h3>Total Jobs</h3>
-          <p class="card-value" id="total-jobs-value">0</p>
+  <main>
+    <section class="box">
+      <h2>Dashboard</h2>
+      <p>
+        This page gives a quick overview of how many embroidery jobs are currently in the system
+        and where they are in the process.
+      </p>
+    </section>
+
+    <section class="box">
+      <h3>Overall Stats</h3>
+      <div class="stats-container">
+        <div class="stat">
+          <div class="stat-title">Total Jobs</div>
+          <div class="stat-value" id="stat-total">-</div>
         </div>
-        <div class="card" id="card-in-progress">
-          <h3>In Progress</h3>
-          <p class="card-value" id="in-progress-value">0</p>
+        <div class="stat">
+          <div class="stat-title">In Progress</div>
+          <div class="stat-value" id="stat-in-progress">-</div>
         </div>
-        <div class="card" id="card-due-soon">
-          <h3>Due This Week</h3>
-          <p class="card-value" id="due-soon-value">0</p>
+        <div class="stat">
+          <div class="stat-title">Ready for Pickup</div>
+          <div class="stat-value" id="stat-ready">-</div>
+        </div>
+        <div class="stat">
+          <div class="stat-title">Awaiting Customer / Payment</div>
+          <div class="stat-value" id="stat-awaiting">-</div>
         </div>
       </div>
     </section>
 
-    <section class="section">
-      <h2>Recent Jobs</h2>
-      <table class="table" id="recent-jobs-table">
-        <thead>
-          <tr>
-            <th>Customer</th>
-            <th>Job Type</th>
-            <th>Status</th>
-            <th>Due Date</th>
-          </tr>
-        </thead>
-        <tbody>
-        
-        </tbody>
-      </table>
+    <section class="box">
+      <h3>Shortcuts</h3>
+      <ul class="links">
+        <li><a href="add-job.html">Add a new embroidery job</a></li>
+        <li><a href="view-jobs.html">View all jobs in the system</a></li>
+        <li><a href="search.html">Search for a job by name, school, or PO number</a></li>
+        <li><a href="help.html">Read how the statuses and fields work</a></li>
+      </ul>
     </section>
   </main>
 
-  <footer class="app-footer">
-    <p>Staff use only · Educational Outfitters / Embroidery Shop</p>
+  <footer>
+    Embroidery Job Tracker · CS408
   </footer>
 
-  <script src="../js/main.js"></script>
-  <script src="../js/dashboard.js"></script>
+  <script>
+    const API_BASE = ""; // TODO: set real URL
+
+    async function loadStats() {
+      const totalEl = document.getElementById("stat-total");
+      const inProgEl = document.getElementById("stat-in-progress");
+      const readyEl = document.getElementById("stat-ready");
+      const awaitingEl = document.getElementById("stat-awaiting");
+
+      try {
+        const res = await fetch(API_BASE + "/jobs");
+        if (!res.ok) {
+          throw new Error("Failed to load jobs");
+        }
+        const jobs = await res.json();
+
+        let total = jobs.length;
+        let inProgress = 0;
+        let ready = 0;
+        let awaiting = 0;
+
+        for (let i = 0; i < jobs.length; i++) {
+          const s = (jobs[i].status || "").toLowerCase();
+          if (s === "in progress") inProgress++;
+          if (s.indexOf("ready") !== -1) ready++;
+          if (s.indexOf("awaiting") !== -1) awaiting++;
+        }
+
+        totalEl.textContent = total;
+        inProgEl.textContent = inProgress;
+        readyEl.textContent = ready;
+        awaitingEl.textContent = awaiting;
+      } catch (e) {
+        console.error(e);
+        totalEl.textContent = "Error";
+        inProgEl.textContent = "-";
+        readyEl.textContent = "-";
+        awaitingEl.textContent = "-";
+      }
+    }
+
+    loadStats();
+  </script>
 </body>
 </html>

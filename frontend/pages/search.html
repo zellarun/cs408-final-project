@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Search Jobs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+    }
+
+    header {
+      background: #234b7a;
+      color: white;
+      padding: 10px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 10px;
+      font-size: 14px;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    main {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 0 10px;
+    }
+
+    .box {
+      background: white;
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px 15px;
+      font-size: 14px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      margin-bottom: 3px;
+      font-weight: bold;
+    }
+
+    input, select {
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .full {
+      grid-column: 1 / -1;
+    }
+
+    .actions {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    button {
+      padding: 7px 12px;
+      font-size: 14px;
+      border-radius: 3px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: #234b7a;
+      color: white;
+    }
+
+    .btn-secondary {
+      background: #ddd;
+      color: #222;
+    }
+
+    #status-msg {
+      font-size: 13px;
+      color: #555;
+    }
+
+    .result {
+      border: 1px solid #ddd;
+      padding: 8px;
+      margin-top: 8px;
+      background: #fafafa;
+      font-size: 13px;
+    }
+
+    #results-count {
+      font-size: 13px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Embroidery Job Tracker</h1>
+    <nav>
+      <a href="index.html">Dashboard</a>
+      <a href="add-job.html">Add Job</a>
+      <a href="view-jobs.html">View Jobs</a>
+      <a href="search.html">Search</a>
+      <a href="help.html">Help</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="box">
+      <h2>Search Jobs</h2>
+      <p>Search by customer name, school/business, PO number, or job ID.</p>
+
+      <form id="search-form">
+        <div class="field full">
+          <label for="q">Search text</label>
+          <input id="q" name="q" type="text" />
+        </div>
+
+        <div class="field">
+          <label for="status">Status</label>
+          <select id="status" name="status">
+            <option value="">Any</option>
+            <option value="Intake">Intake</option>
+            <option value="Art / Digitizing">Art / Digitizing</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Ready for Pickup">Ready for Pickup</option>
+            <option value="Completed">Completed</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="dueBefore">Due before</label>
+          <input id="dueBefore" name="dueBefore" type="date" />
+        </div>
+
+        <div class="field">
+          <label for="dueAfter">Due after</label>
+          <input id="dueAfter" name="dueAfter" type="date" />
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn-primary">Search</button>
+          <button type="button" id="clear-btn" class="btn-secondary">Clear</button>
+          <span id="status-msg"></span>
+        </div>
+      </form>
+
+      <div id="results-count"></div>
+      <div id="results"></div>
+    </section>
+  </main>
+
+  <script>
+    const API_BASE = ""; // TODO: set real URL
+
+    const form = document.getElementById("search-form");
+    const clearBtn = document.getElementById("clear-btn");
+    const statusMsg = document.getElementById("status-msg");
+    const resultsCount = document.getElementById("results-count");
+    const resultsEl = document.getElementById("results");
+
+    let jobs = [];
+    let loaded = false;
+
+    async function loadJobsIfNeeded() {
+      if (loaded) return;
+      statusMsg.textContent = "Loading jobs...";
+      try {
+        const res = await fetch(API_BASE + "/jobs");
+        if (!res.ok) {
+          throw new Error("Failed to load jobs");
+        }
+        jobs = await res.json();
+        loaded = true;
+        statusMsg.textContent = "";
+      } catch (err) {
+        console.error(err);
+        statusMsg.textContent = "Error loading jobs.";
+      }
+    }
+
+    function formatDate(s) {
+      if (!s) return "";
+      const d = new Date(s);
+      if (isNaN(d)) return s;
+      return d.toLocaleDateString();
+    }
+
+    function runSearch() {
+      const q = document.getElementById("q").value.trim().toLowerCase();
+      const status = document.getElementById("status").value;
+      const dueBefore = document.getElementById("dueBefore").value;
+      const dueAfter = document.getElementById("dueAfter").value;
+
+      const before = dueBefore ? new Date(dueBefore) : null;
+      const after = dueAfter ? new Date(dueAfter) : null;
+
+      const filtered = [];
+
+      for (let i = 0; i < jobs.length; i++) {
+        const job = jobs[i];
+
+        if (status && job.status !== status) {
+          continue;
+        }
+
+        if ((before || after) && job.dueDate) {
+          const d = new Date(job.dueDate);
+          if (before && d > before) continue;
+          if (after && d < after) continue;
+        }
+
+        if (q) {
+          const text = [
+            job.jobId,
+            job.customerName,
+            job.organization,
+            job.poNumber,
+            job.itemType
+          ]
+            .filter(Boolean)
+            .join(" ")
+            .toLowerCase();
+
+          if (text.indexOf(q) === -1) {
+            continue;
+          }
+        }
+
+        filtered.push(job);
+      }
+
+      resultsEl.innerHTML = "";
+      if (filtered.length === 0) {
+        resultsCount.textContent = "No jobs match this search.";
+        return;
+      }
+
+      resultsCount.textContent = filtered.length + " job(s) found";
+      for (let i = 0; i < filtered.length; i++) {
+        const job = filtered[i];
+        const div = document.createElement("div");
+        div.className = "result";
+
+        div.innerHTML =
+          "<strong>" + (job.customerName || "(no name)") + "</strong><br>" +
+          "Job ID: " + (job.jobId || "-") + "<br>" +
+          "Org: " + (job.organization || "-") + "<br>" +
+          "Item: " + (job.itemType || "-") + " (" + (job.itemColor || "") + ")<br>" +
+          "Qty: " + (job.quantity != null ? job.quantity : "-") + "<br>" +
+          "Status: " + (job.status || "-") + "<br>" +
+          "Due: " + (formatDate(job.dueDate) || "-") + "<br>" +
+          (job.notes ? "Notes: " + job.notes : "");
+
+        resultsEl.appendChild(div);
+      }
+    }
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      await loadJobsIfNeeded();
+      runSearch();
+    });
+
+    clearBtn.addEventListener("click", function () {
+      form.reset();
+      resultsEl.innerHTML = "";
+      resultsCount.textContent = "";
+      statusMsg.textContent = "";
+    });
+  </script>
+</body>
+</html>
