@@ -1,18 +1,14 @@
-window.onload = loaded;
-
-/**
- * Simple Function that will be run when the browser is finished loading.
- */
-function loaded() {
-    // Assign to a variable so we can set a breakpoint in the debugger!
-    const hello = sayHello();
-    console.log(hello);
+async function fetchJob(jobID) {
+  const res = await fetch(`${API_BASE}/embroidery-jobs/${jobID}`);
+  if (!res.ok) throw new Error("Failed to fetch job");
+  return res.json();
 }
 
-/**
- * This function returns the string 'hello'
- * @return {string} the string hello
- */
-export function sayHello() {
-    return 'hello';
+async function deleteJob(jobID) {
+  const res = await fetch(`${API_BASE}/embroidery-jobs/${jobID}`, {
+    method: "DELETE",
+  });
+  if (!res.ok && res.status !== 204) {
+    throw new Error("Failed to delete job");
+  }
 }

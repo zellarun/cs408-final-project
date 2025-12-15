@@ -100,6 +100,13 @@
     }
   </style>
 </head>
+
+<script src="../js/api.js"></script>
+<script src="../js/dashboard.js"></script>
+</body>
+</html>
+
+
 <body>
   <header>
     <h1>Embroidery Job Tracker</h1>
@@ -159,7 +166,7 @@
   </footer>
 
   <script>
-    const API_BASE = ""; // TODO: set real URL
+    const API_BASE = " https://p8aejde0rj.execute-api.us-east-2.amazonaws.com/embroidery-jobs"; // TODO: set real URL
 
     async function loadStats() {
       const totalEl = document.getElementById("stat-total");

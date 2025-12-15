@@ -107,6 +107,12 @@
     }
   </style>
 </head>
+
+<script src="../js/api.js"></script>
+<script src="../js/view-jobs.js"></script>
+</body>
+</html>
+
 <body>
   <header>
     <h1>Embroidery Job Tracker</h1>
@@ -167,7 +173,7 @@
   </main>
 
   <script>
-    const API_BASE = ""; // TODO: set real URL
+    const API_BASE = " https://p8aejde0rj.execute-api.us-east-2.amazonaws.com/embroidery-jobs";
 
     const statusFilter = document.getElementById("status-filter");
     const searchBox = document.getElementById("search-box");
